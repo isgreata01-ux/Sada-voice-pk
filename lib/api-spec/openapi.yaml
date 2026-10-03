@@ -10,6 +10,12 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: account
+    description: Signed-in account details
+  - name: voice
+    description: ElevenLabs voice cloning and speech generation
+  - name: admin
+    description: Administrator-only account and token management
 paths:
   /healthz:
     get:
@@ -24,6 +30,172 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /account:
+    get:
+      operationId: getAccount
+      tags: [account]
+      summary: Get the signed-in account
+      responses:
+        "200":
+          description: Current account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account"
+  /voice-studio/voices:
+    get:
+      operationId: listVoices
+      tags: [voice]
+      summary: List available ElevenLabs voices
+      responses:
+        "200":
+          description: Available voices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Voice"
+  /voice-studio/models:
+    get:
+      operationId: listVoiceModels
+      tags: [voice]
+      summary: List supported text-to-speech models
+      responses:
+        "200":
+          description: Available speech models
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VoiceModel"
+  /voice-studio/voices/clone:
+    post:
+      operationId: cloneVoice
+      tags: [voice]
+      summary: Create a cloned voice from an authorized audio sample
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VoiceCloneInput"
+      responses:
+        "201":
+          description: Cloned voice
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Voice"
+  /voice-studio/speech:
+    post:
+      operationId: generateSpeech
+      tags: [voice]
+      summary: Generate downloadable speech audio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpeechGenerationInput"
+      responses:
+        "200":
+          description: Generated audio and updated token balance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpeechGeneration"
+  /admin/summary:
+    get:
+      operationId: getAdminSummary
+      tags: [admin]
+      summary: Get admin dashboard totals and recent activity
+      responses:
+        "200":
+          description: Admin dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSummary"
+  /admin/users:
+    get:
+      operationId: listAdminUsers
+      tags: [admin]
+      summary: Search and list managed accounts
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 120
+      responses:
+        "200":
+          description: Managed accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminUser"
+    post:
+      operationId: inviteAdminUser
+      tags: [admin]
+      summary: Invite an account and set its starting token balance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InviteUserInput"
+      responses:
+        "201":
+          description: Invited account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUser"
+  /admin/users/{id}/tokens:
+    patch:
+      operationId: setAdminUserTokens
+      tags: [admin]
+      summary: Set an account's exact token balance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenBalanceInput"
+      responses:
+        "200":
+          description: Updated account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUser"
+  /admin/users/{id}:
+    delete:
+      operationId: removeAdminUser
+      tags: [admin]
+      summary: Remove a managed account and its invitation or identity
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Account removed
 components:
   schemas:
     HealthStatus:
@@ -33,4 +205,193 @@ components:
           type: string
       required:
         - status
+    Account:
+      type: object
+      required: [id, email, displayName, role, tokenBalance, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        displayName:
+          type: string
+        role:
+          type: string
+          enum: [admin, user]
+        tokenBalance:
+          type: integer
+          minimum: 0
+        createdAt:
+          type: string
+          format: date-time
+    AdminUser:
+      type: object
+      required: [id, email, displayName, status, tokenBalance, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        displayName:
+          type: string
+        status:
+          type: string
+          enum: [active, pending]
+        tokenBalance:
+          type: integer
+          minimum: 0
+        createdAt:
+          type: string
+          format: date-time
+    Voice:
+      type: object
+      required: [voiceId, name, description, category, previewUrl]
+      properties:
+        voiceId:
+          type: string
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        category:
+          type: string
+        previewUrl:
+          type: ["string", "null"]
+          format: uri
+    VoiceModel:
+      type: object
+      required: [modelId, name, description]
+      properties:
+        modelId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+    AdminActivity:
+      type: object
+      required: [id, description, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    AdminSummary:
+      type: object
+      required: [usersTotal, activeUsers, pendingInvites, totalTokens, generatedAudio, recentActivity]
+      properties:
+        usersTotal:
+          type: integer
+        activeUsers:
+          type: integer
+        pendingInvites:
+          type: integer
+        totalTokens:
+          type: integer
+        generatedAudio:
+          type: integer
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminActivity"
+    InviteUserInput:
+      type: object
+      required: [email, displayName, initialTokens]
+      properties:
+        email:
+          type: string
+          format: email
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        initialTokens:
+          type: integer
+          minimum: 0
+          maximum: 1000000000
+    TokenBalanceInput:
+      type: object
+      required: [balance]
+      properties:
+        balance:
+          type: integer
+          minimum: 0
+          maximum: 1000000000
+    VoiceCloneInput:
+      type: object
+      required: [name, fileName, mimeType, audioBase64, consentAcknowledged]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 80
+        description:
+          type: string
+          maxLength: 500
+        fileName:
+          type: string
+          minLength: 1
+          maxLength: 180
+        mimeType:
+          type: string
+          enum: [audio/mpeg, audio/wav, audio/x-wav, audio/mp4, audio/webm]
+        audioBase64:
+          type: string
+          minLength: 1000
+          maxLength: 14680064
+        consentAcknowledged:
+          type: boolean
+          enum: [true]
+    SpeechGenerationInput:
+      type: object
+      required: [voiceId, text, modelId, stability, similarityBoost, style, useSpeakerBoost]
+      properties:
+        voiceId:
+          type: string
+          minLength: 1
+          maxLength: 128
+        text:
+          type: string
+          minLength: 1
+          maxLength: 5000
+        modelId:
+          type: string
+          minLength: 1
+          maxLength: 128
+        stability:
+          type: number
+          minimum: 0
+          maximum: 1
+        similarityBoost:
+          type: number
+          minimum: 0
+          maximum: 1
+        style:
+          type: number
+          minimum: 0
+          maximum: 1
+        useSpeakerBoost:
+          type: boolean
+    SpeechGeneration:
+      type: object
+      required: [audioBase64, mimeType, fileName, charactersUsed, remainingTokens]
+      properties:
+        audioBase64:
+          type: string
+        mimeType:
+          type: string
+        fileName:
+          type: string
+        charactersUsed:
+          type: integer
+        remainingTokens:
+          type: integer
 

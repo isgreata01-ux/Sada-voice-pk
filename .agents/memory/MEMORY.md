@@ -1,0 +1,1 @@
+- [Vite React cache after upgrades](vite-react-cache.md) — stale optimized dependencies can retain old React versions after the package tree is aligned.
