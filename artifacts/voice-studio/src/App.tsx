@@ -61,7 +61,7 @@ function Mark({ inverse = false }: { inverse?: boolean }) {
 }
 
 function Logo({ inverse = false }: { inverse?: boolean }) {
-  return <span className="inline-flex items-center gap-3"><Mark inverse={inverse} /><span className={`brand-display text-[19px] font-extrabold tracking-[-.06em] ${inverse ? 'text-[#f4eadb]' : 'text-[#203a3d]'}`}>voice<span className="font-medium">studio</span><sup className="ml-1 text-[9px] tracking-normal opacity-60">®</sup></span></span>;
+  return <span className="inline-flex items-center gap-2 sm:gap-3"><Mark inverse={inverse} /><span aria-label="Sada.Voice.PK" className={`brand-display whitespace-nowrap text-[16px] font-extrabold tracking-[-.06em] sm:text-[19px] ${inverse ? 'text-[#f4eadb]' : 'text-[#203a3d]'}`}>Sada.<span className="font-medium">Voice.PK</span></span></span>;
 }
 
 function LoadingScreen() {
