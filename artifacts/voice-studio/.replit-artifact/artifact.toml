@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Voice Studio"
+description = "An admin-managed voice studio with secure user and token administration, voice cloning, high-quality speech generation, and downloadable audio."
+version = "1.0.0"
+id = "artifacts/voice-studio"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21159
+
+[services.development]
+run = "pnpm --filter @workspace/voice-studio run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/voice-studio", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/voice-studio/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21159"
+BASE_PATH = "/"
