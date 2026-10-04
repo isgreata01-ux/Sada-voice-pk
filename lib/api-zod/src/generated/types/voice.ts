@@ -14,4 +14,5 @@ export interface Voice {
   category: string;
   /** @nullable */
   previewUrl: string | null;
+  isAppClone: boolean;
 }

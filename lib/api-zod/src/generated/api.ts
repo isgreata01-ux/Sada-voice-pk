@@ -42,9 +42,24 @@ export const ListVoicesResponseItem = zod.object({
   "name": zod.string(),
   "description": zod.string().nullable(),
   "category": zod.string(),
-  "previewUrl": zod.string().url().nullable()
+  "previewUrl": zod.string().url().nullable(),
+  "isAppClone": zod.boolean()
 })
 export const ListVoicesResponse = zod.array(ListVoicesResponseItem)
+
+
+/**
+ * @summary Delete an app-managed cloned voice
+ */
+export const deleteVoicePathVoiceIdMax = 128;
+
+
+
+export const DeleteVoiceParams = zod.object({
+  "voiceId": zod.coerce.string().min(1).max(deleteVoicePathVoiceIdMax)
+})
+
+export const DeleteVoiceResponse = zod.void()
 
 
 /**
@@ -86,7 +101,8 @@ export const CloneVoiceResponse = zod.object({
   "name": zod.string(),
   "description": zod.string().nullable(),
   "category": zod.string(),
-  "previewUrl": zod.string().url().nullable()
+  "previewUrl": zod.string().url().nullable(),
+  "isAppClone": zod.boolean()
 })
 
 
@@ -120,12 +136,22 @@ export const GenerateSpeechBody = zod.object({
   "useSpeakerBoost": zod.boolean()
 })
 
+export const generateSpeechResponseDurationSecondsMin = 0;
+
+export const generateSpeechResponseTokensUsedMin = 0;
+
+export const generateSpeechResponseRemainingTokensMin = 0;
+
+
+
 export const GenerateSpeechResponse = zod.object({
   "audioBase64": zod.string(),
   "mimeType": zod.string(),
   "fileName": zod.string(),
   "charactersUsed": zod.number().int(),
-  "remainingTokens": zod.number().int()
+  "durationSeconds": zod.number().min(generateSpeechResponseDurationSecondsMin),
+  "tokensUsed": zod.number().int().min(generateSpeechResponseTokensUsedMin),
+  "remainingTokens": zod.number().int().min(generateSpeechResponseRemainingTokensMin).nullable()
 })
 
 

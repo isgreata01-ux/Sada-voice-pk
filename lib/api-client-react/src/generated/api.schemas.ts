@@ -53,6 +53,7 @@ export interface Voice {
   category: string;
   /** @nullable */
   previewUrl: string | null;
+  isAppClone: boolean;
 }
 
 export interface VoiceModel {
@@ -170,7 +171,15 @@ export interface SpeechGeneration {
   mimeType: string;
   fileName: string;
   charactersUsed: number;
-  remainingTokens: number;
+  /** @minimum 0 */
+  durationSeconds: number;
+  /** @minimum 0 */
+  tokensUsed: number;
+  /**
+     * @minimum 0
+     * @nullable
+     */
+  remainingTokens: number | null;
 }
 
 export type ListAdminUsersParams = {

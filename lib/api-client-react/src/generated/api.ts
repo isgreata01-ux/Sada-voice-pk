@@ -293,6 +293,80 @@ export function useListVoices<TData = Awaited<ReturnType<typeof listVoices>>, TE
 
 
 
+export const getDeleteVoiceUrl = (voiceId: string,) => {
+
+
+
+
+  return `/api/voice-studio/voices/${voiceId}`
+}
+
+/**
+ * @summary Delete an app-managed cloned voice
+ */
+export const deleteVoice = async (voiceId: string, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getDeleteVoiceUrl(voiceId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteVoiceMutationKey = () => ['deleteVoice'] as const;
+
+export const getDeleteVoiceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteVoice>>, TError,DeleteVoiceMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteVoice>>, TError,DeleteVoiceMutationVariables, TContext> => {
+
+const mutationKey = getDeleteVoiceMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteVoice>>, DeleteVoiceMutationVariables> = (props) => {
+          const {voiceId} = props ?? {};
+
+          return  deleteVoice(voiceId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteVoiceMutationResult = NonNullable<Awaited<ReturnType<typeof deleteVoice>>>
+
+    export type DeleteVoiceMutationError = ErrorType<unknown>
+    export type DeleteVoiceMutationVariables = {voiceId: string}
+
+    /**
+ * @summary Delete an app-managed cloned voice
+ */
+export const useDeleteVoice = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteVoice>>, TError,DeleteVoiceMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteVoice>>,
+        TError,
+        DeleteVoiceMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteVoiceMutationOptions(options));
+    }
+
 export const getListVoiceModelsUrl = () => {
 
 

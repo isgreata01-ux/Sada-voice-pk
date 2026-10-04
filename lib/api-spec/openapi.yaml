@@ -56,6 +56,22 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Voice"
+  /voice-studio/voices/{voiceId}:
+    delete:
+      operationId: deleteVoice
+      tags: [voice]
+      summary: Delete an app-managed cloned voice
+      parameters:
+        - name: voiceId
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 128
+      responses:
+        "204":
+          description: Cloned voice deleted
   /voice-studio/models:
     get:
       operationId: listVoiceModels
@@ -249,7 +265,7 @@ components:
           format: date-time
     Voice:
       type: object
-      required: [voiceId, name, description, category, previewUrl]
+      required: [voiceId, name, description, category, previewUrl, isAppClone]
       properties:
         voiceId:
           type: string
@@ -262,6 +278,8 @@ components:
         previewUrl:
           type: ["string", "null"]
           format: uri
+        isAppClone:
+          type: boolean
     VoiceModel:
       type: object
       required: [modelId, name, description]
@@ -382,7 +400,7 @@ components:
           type: boolean
     SpeechGeneration:
       type: object
-      required: [audioBase64, mimeType, fileName, charactersUsed, remainingTokens]
+      required: [audioBase64, mimeType, fileName, charactersUsed, durationSeconds, tokensUsed, remainingTokens]
       properties:
         audioBase64:
           type: string
@@ -392,6 +410,13 @@ components:
           type: string
         charactersUsed:
           type: integer
-        remainingTokens:
+        durationSeconds:
+          type: number
+          minimum: 0
+        tokensUsed:
           type: integer
+          minimum: 0
+        remainingTokens:
+          type: ["integer", "null"]
+          minimum: 0
 
