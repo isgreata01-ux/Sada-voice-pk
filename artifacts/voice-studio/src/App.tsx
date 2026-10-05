@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
-import { ClerkProvider, SignIn, SignUp, useAuth, useClerk } from '@clerk/react';
+import { ClerkProvider, SignIn, SignUp, useAuth, useClerk, UserButton } from '@clerk/react';
 import { publishableKeyFromHost } from '@clerk/react/internal';
 import { shadcn } from '@clerk/themes';
 import { Route, Switch, Redirect, Link, useLocation, Router as WouterRouter } from 'wouter';
@@ -79,9 +79,26 @@ function PublicHome() {
       <Link href="/" className="no-underline" data-testid="link-home-logo"><Logo /></Link>
       <nav className="hidden items-center gap-9 text-[13px] font-semibold text-[#6e7b78] md:flex">
         <a href="#studio" className="transition hover:text-[#20383c]" data-testid="link-studio-section">The studio</a><a href="#workflow" className="transition hover:text-[#20383c]" data-testid="link-workflow-section">How it works</a><a href="#principles" className="transition hover:text-[#20383c]" data-testid="link-principles-section">Our standard</a>
-      </nav>
-      <div className="flex shrink-0 items-center gap-1 sm:gap-3"><Link href="/sign-in" className="whitespace-nowrap rounded-full px-2.5 py-2.5 text-xs font-semibold text-[#20383c] hover:bg-[#e9e6dc] sm:px-4 sm:text-sm" data-testid="link-sign-in">Sign in</Link><Link href="/sign-up" className="whitespace-nowrap rounded-full bg-[#20383c] px-3 py-2.5 text-xs font-semibold text-[#fbf8ef] transition hover:bg-[#345457] sm:px-5 sm:text-sm" data-testid="link-get-started">Get started <ArrowRight className="ml-1.5 inline" size={15} /></Link></div>
-    </header>
+      </nav> 
+<div className="flex shrink-0 items-center gap-1 sm:gap-3">
+  {isSignedIn ? (
+    <UserButton />
+  ) : (
+    <>
+      <Link href="/sign-in">
+        <button className="whitespace-nowrap rounded-full px-2.5 py-2.5 text-xs font-semibold text-[#20383c] hover:bg-[#e9e6dc] sm:px-4 sm:text-sm">
+          Sign In
+        </button>
+      </Link>
+      <Link href="/sign-up">
+        <button className="whitespace-nowrap rounded-full bg-[#20383c] px-2.5 py-2.5 text-xs font-semibold text-[#f8f6ef] hover:bg-[#345457] sm:px-5 sm:text-sm">
+          Sign Up
+        </button>
+      </Link>
+    </>
+  )}
+</div>
+    </header> 
     <section className="studio-grid relative mx-auto grid min-h-[690px] max-w-[1440px] grid-cols-1 items-center gap-12 px-6 pb-20 pt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,.92fr)] lg:px-16 lg:pb-28 lg:pt-16">
       <div className="relative z-[1] w-full min-w-0 max-w-[670px] rise-in">
         <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#c9d5ce] bg-[#f9f7f0]/80 px-3.5 py-2 text-[11px] font-bold uppercase tracking-[.12em] text-[#52716c]"><span className="h-1.5 w-1.5 rounded-full bg-[#75a58d]" />A clear voice, beautifully made</div>
