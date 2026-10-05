@@ -23,3 +23,8 @@ timeoutMs = 20000
 
 [userenv.shared]
 ADMIN_EMAIL = "isgreata01@gmail.com"
+
+[[ports]]
+localPort = 5173
+externalPort = 80
+exposeLocalhost = true
